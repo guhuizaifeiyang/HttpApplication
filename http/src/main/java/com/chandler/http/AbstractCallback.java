@@ -1,20 +1,23 @@
 package com.chandler.http;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 
 /**
- * Created by weijie on 18-3-23.
+ * Created by yaomenglin on 2018/3/23.
  */
 
-public abstract class Callback<T> implements ICallback<T> {
-
-    private Class<T> clz;
+public abstract class AbstractCallback<T> implements ICallback<T> {
     @Override
     public T parse(HttpURLConnection connection) throws Exception {
         int status = connection.getResponseCode();
@@ -30,16 +33,11 @@ public abstract class Callback<T> implements ICallback<T> {
             out.flush();
             out.close();
             String result = new String(out.toByteArray());
-            JSONObject json = new JSONObject(result);
-            JSONObject data = json.optJSONObject("data");
-            Gson gson = new Gson();
-            return gson.fromJson(data.toString(), clz);
+            Log.d("chandler", "parse: result =" + result);
+            return bindData(result);
         }
         return null;
     }
 
-   public ICallback setReturnType(Class<T> clz) {
-       this.clz = clz;
-       return this;
-   }
+    protected abstract T bindData(String result) throws Exception;
 }
