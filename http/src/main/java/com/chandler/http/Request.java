@@ -9,6 +9,7 @@ import java.util.Map;
 public class Request {
     public enum RequestMethod {GET, POST, PUT, DELETE}
 
+    public ICallback callback;
 
     public String url;
     public String content;
@@ -24,5 +25,9 @@ public class Request {
     public Request(String url){
         this.url = url;
         this.method = RequestMethod.GET;
+    }
+
+    public void setCallback(ICallback callback) {
+        this.callback = callback;
     }
 }
