@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 
 
 /**
@@ -20,11 +21,15 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
     @Override
     protected Object doInBackground(Void... voids) {
         try {
-            return HttpUrlConnectionUtil.execute(request);
+            HttpURLConnection connection =  HttpUrlConnectionUtil.execute(request);
+            return request.callback.parse(connection);
         } catch (IOException e) {
             e.printStackTrace();
+            return e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return e;
         }
-        return null;
     }
 
     @Override
