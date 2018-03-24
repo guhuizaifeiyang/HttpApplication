@@ -22,7 +22,18 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
     protected Object doInBackground(Void... voids) {
         try {
             HttpURLConnection connection =  HttpUrlConnectionUtil.execute(request);
-            return request.callback.parse(connection);
+            if (request.isEnableProgress()) {
+                return request.callback.parse(connection, new OnProgressUpdateListener() {
+
+                    @Override
+                    public void onProgressUpdated(int curLen, int totalLen) {
+                        publishProgress(curLen, totalLen);
+                    }
+                });
+            } else {
+                return request.callback.parse(connection);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
             return e;
@@ -30,6 +41,12 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
             e.printStackTrace();
             return e;
         }
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+        request.callback.onProgressUpdated(values[0], values[1]);
     }
 
     @Override

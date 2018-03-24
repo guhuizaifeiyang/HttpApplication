@@ -23,6 +23,11 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
 
     @Override
     public T parse(HttpURLConnection connection) throws Exception {
+        return parse(connection, null);
+    }
+
+    @Override
+    public T parse(HttpURLConnection connection, OnProgressUpdateListener progressUpdateListener) throws Exception {
         int status = connection.getResponseCode();
         if (status == HttpURLConnection.HTTP_OK) {
             String result;
@@ -44,9 +49,14 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
                 FileOutputStream out = new FileOutputStream(path);
                 InputStream is = connection.getInputStream();
                 byte[] buffer = new byte[2048];
-                int len;
+                int totalLen = connection.getContentLength();
+                int len, curLen = 0;
                 while ((len = is.read(buffer)) != -1) {
                     out.write(buffer, 0, len);
+                    curLen += len;
+                    if (progressUpdateListener != null) {
+                        progressUpdateListener.onProgressUpdated(curLen, totalLen);
+                    }
                 }
                 is.close();
                 out.flush();
@@ -55,6 +65,11 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
             }
         }
         return null;
+    }
+
+    @Override
+    public void onProgressUpdated(int curLen, int totalLen) {
+
     }
 
     protected abstract T bindData(String result) throws Exception;

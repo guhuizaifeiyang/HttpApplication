@@ -3,30 +3,27 @@ package com.chandler.httpapplication;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.chandler.http.FileCallback;
-import com.chandler.http.ICallback;
 import com.chandler.http.JasonCallback;
 import com.chandler.http.Request;
 import com.chandler.http.RequestTask;
 
 import java.io.File;
 
-import static android.support.v4.app.ActivityCompat.requestPermissions;
-import static android.support.v4.content.ContextCompat.checkSelfPermission;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int REQUEST_CODE_PERMISSIONS = 123;
     private static final String TAG = "chandler";
+    private boolean mPermissionGranted = false;
     private Button mButton;
 
     @Override
@@ -37,15 +34,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mButton = (Button) findViewById(R.id.btn);
         mButton.setOnClickListener(this);
 
+        checkPermissions();
+
     }
 
     @Override
     public void onClick(View view) {
+        if (!mPermissionGranted) {
+            return;
+        }
         switch (view.getId()) {
             case R.id.btn:
 //                testHttpPostOnSubThread();
 //                testHttpPostOnSubThreadForGeneric();
-                testHttpPostForDownload();
+                testHttpPostForDownloadProgress();
         }
 
     }
@@ -92,11 +94,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         task.execute();
     }
 
-    private void testHttpPostForDownload() {
-        checkPermissions();
+
+    private void testHttpPostForDownloadProgress() {
+        String url = "http://api.stay4it.com/uploads/test.jpg";
+        String path = Environment.getExternalStorageDirectory() + File.separator + "demo.txt";
+        Request request = new Request(url, Request.RequestMethod.GET);
+        request.setEnableProgress(true);
+        request.setCallback(new FileCallback() {
+
+            @Override
+            public void onSuccess(String result) {
+                Log.d(TAG, "testHttpGet return:" + result);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onProgressUpdated(int curLen, int totalLen) {
+                Log.d(TAG, "onProgressUpdated: curLen = " + curLen + ", totalLen = " + totalLen);
+            }
+        }.setCachePath(path));
+        RequestTask task = new RequestTask(request);
+        task.execute();
     }
 
-    private void testHttpPostForDownloadInter() {
+    private void testHttpPostForDownload() {
         String url = "http://api.stay4it.com/v1/public/core/?service=user.login";
         String content = "account=stay4it&password=123456";
         String path = Environment.getExternalStorageDirectory() + File.separator + "demo.txt";
@@ -112,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onFailure(Exception e) {
                 e.printStackTrace();
             }
+
         }.setCachePath(path));
         request.content = content;
         RequestTask task = new RequestTask(request);
@@ -131,8 +157,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         REQUEST_CODE_PERMISSIONS);
             }
-        } else {
-            testHttpPostForDownloadInter();
         }
     }
 
@@ -151,10 +175,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (allPermissionGrant) {
                     // Permission Granted
                     // do something
-                    testHttpPostForDownloadInter();
+                    mPermissionGranted = true;
                 } else {
                     // Permission Denied
-                    Toast.makeText(MainActivity.this, "WRITE_CONTACTS Denied", Toast.LENGTH_SHORT)
+                    mPermissionGranted = false;
+                    Toast.makeText(MainActivity.this, "PERMISSIONS Denied", Toast.LENGTH_SHORT)
                             .show();
                 }
                 break;

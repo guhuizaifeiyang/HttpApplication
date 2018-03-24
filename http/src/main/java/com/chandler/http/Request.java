@@ -11,6 +11,15 @@ public class Request {
 
     public ICallback callback;
 
+    public boolean isEnableProgress() {
+        return enableProgress;
+    }
+
+    public void setEnableProgress(boolean enableProgress) {
+        this.enableProgress = enableProgress;
+    }
+
+    public boolean enableProgress= false;
     public String url;
     public String content;
     public Map<String, String> headers;
