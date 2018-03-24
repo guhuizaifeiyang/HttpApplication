@@ -26,6 +26,12 @@ public class Request {
 
     public RequestMethod method;
 
+    public void setOnGlobalExceptionListener(OnGlobalExceptionListener onGlobalExceptionListener) {
+        this.onGlobalExceptionListener = onGlobalExceptionListener;
+    }
+
+    public OnGlobalExceptionListener onGlobalExceptionListener;
+
     public Request(String url,RequestMethod method){
         this.url = url;
         this.method = method;

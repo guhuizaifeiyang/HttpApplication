@@ -21,7 +21,7 @@ import com.chandler.http.RequestTask;
 import java.io.File;
 import java.util.TreeMap;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int REQUEST_CODE_PERMISSIONS = 123;
     private static final String TAG = "chandler";
@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d(TAG, "onProgressUpdated: curLen = " + curLen + ", totalLen = " + totalLen);
             }
         }.setCachePath(path));
+        request.setOnGlobalExceptionListener(this);
         RequestTask task = new RequestTask(request);
         task.execute();
     }
