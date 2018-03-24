@@ -12,18 +12,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.chandler.http.AppException;
 import com.chandler.http.FileCallback;
 import com.chandler.http.JasonCallback;
 import com.chandler.http.Request;
 import com.chandler.http.RequestTask;
 
 import java.io.File;
+import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int REQUEST_CODE_PERMISSIONS = 123;
     private static final String TAG = "chandler";
-    private boolean mPermissionGranted = false;
+    private static boolean mPermissionGranted = false;
     private Button mButton;
 
     @Override
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+        Log.d(TAG, "onClick: permission = " + mPermissionGranted);
         if (!mPermissionGranted) {
             return;
         }
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
                 e.printStackTrace();
             }
         });
@@ -85,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
                 e.printStackTrace();
             }
         });
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void testHttpPostForDownloadProgress() {
+        Log.d(TAG, "testHttpPostForDownloadProgress: ");
         String url = "http://api.stay4it.com/uploads/test.jpg";
         String path = Environment.getExternalStorageDirectory() + File.separator + "demo.txt";
         Request request = new Request(url, Request.RequestMethod.GET);
@@ -108,7 +112,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
+                Log.d(TAG, "onFailure: status code = " + e.statusCode + ", message = " + e.responseMessage);
                 e.printStackTrace();
             }
 
@@ -134,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
                 e.printStackTrace();
             }
 
@@ -150,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Request read and write permissions
      */
     private void checkPermissions() {
+        Log.d(TAG, "checkPermissions: ");
         int hasWritePermission = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int hasReadPermission = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
         if (hasWritePermission != PackageManager.PERMISSION_GRANTED || hasReadPermission != PackageManager.PERMISSION_GRANTED) {
@@ -157,11 +163,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         REQUEST_CODE_PERMISSIONS);
             }
+        } else {
+            mPermissionGranted = true;
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult: request code = " + requestCode);
         switch (requestCode) {
             case REQUEST_CODE_PERMISSIONS:
                 boolean allPermissionGrant = true;

@@ -9,10 +9,10 @@ import java.net.HttpURLConnection;
 public interface ICallback<T> {
     void onSuccess(String result);
 
-    void onFailure(Exception o);
+    void onFailure(AppException o);
 
-    T parse(HttpURLConnection connection, OnProgressUpdateListener progressUpdateListener) throws Exception;
-    T parse(HttpURLConnection connection) throws Exception;
+    T parse(HttpURLConnection connection, OnProgressUpdateListener progressUpdateListener) throws AppException;
+    T parse(HttpURLConnection connection) throws AppException;
 
     void onProgressUpdated(int curLen, int totalLen);
 

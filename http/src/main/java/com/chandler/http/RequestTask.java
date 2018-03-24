@@ -34,10 +34,7 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
                 return request.callback.parse(connection);
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            return e;
-        } catch (Exception e) {
+        } catch (AppException e) {
             e.printStackTrace();
             return e;
         }
@@ -52,9 +49,11 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
     @Override
     protected void onPostExecute(Object o) {
         super.onPostExecute(o);
-        if (o instanceof Exception) {
-            Log.d("chandler", "onPostExecute: exception = "+(Exception) o);
+        if (o instanceof AppException) {
+            request.callback.onFailure((AppException) o);
+            Log.d("chandler", "onPostExecute: exception = "+(AppException) o);
         } else {
+            request.callback.onSuccess((String) o);
             Log.d("chandler", "onPostExecute: result = " + o);
         }
     }

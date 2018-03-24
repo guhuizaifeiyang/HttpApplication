@@ -6,7 +6,7 @@ package com.chandler.http;
 
 public abstract class StringCallback extends AbstractCallback<String> {
     @Override
-    protected String bindData(String result) throws Exception {
+    protected String bindData(String result) throws AppException {
         return result;
     }
 }
