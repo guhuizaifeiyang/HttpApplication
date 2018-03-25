@@ -20,7 +20,7 @@ public abstract class JasonCallback<T> extends AbstractCallback<T> {
     protected T bindData(String result) throws AppException {
         try {
             JSONObject json = new JSONObject(result);
-            JSONObject data = json.optJSONObject("data");
+            Object data = json.opt("data");
             Gson gson = new Gson();
             Type type = ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
             return gson.fromJson(data.toString(), type);

@@ -20,6 +20,7 @@ import com.chandler.http.RequestManager;
 import com.chandler.http.RequestTask;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -42,12 +43,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        RequestManager.getInstance().cancelRequest(toString());
-    }
-
-    @Override
     public void onClick(View view) {
         Log.d(TAG, "onClick: permission = " + mPermissionGranted);
         if (!mPermissionGranted) {
@@ -58,9 +53,39 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //                testHttpPostOnSubThread();
 //                testHttpPostOnSubThreadForGeneric();
 //                testHttpPostForDownloadProgress();
-                testHttpPostForDownloadProgressCancelTest();
+//                testHttpPostForDownloadProgressCancelTest();
+                testHttpPostOnSubThreadForGenericLoadMore();
         }
 
+    }
+
+    private void testHttpPostOnSubThreadForGenericLoadMore() {
+        String url = "http://api.stay4it.com/v1/public/core/?service=user.getAll";
+        url += "&timestamp=" + System.currentTimeMillis() + "&count=30";
+        Request request = new Request(url, Request.RequestMethod.GET);
+        request.setCallback(new JasonCallback<ArrayList<Module>>() {
+            @Override
+            public ArrayList<Module> preRequest() {
+                return null;
+            }
+
+            @Override
+            public ArrayList<Module> postRequest(ArrayList<Module> modules) {
+                return modules;
+            }
+
+            @Override
+            public void onSuccess(ArrayList<Module> result) {
+                Log.d("chandler", "testHttpGet return:" + result);
+            }
+
+            @Override
+            public void onFailure(AppException e) {
+                e.printStackTrace();
+            }
+        });
+        RequestTask task = new RequestTask(request);
+        task.execute();
     }
 
     private void testHttpPostOnSubThreadForGeneric() {
@@ -70,7 +95,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         request.setCallback(new JasonCallback<User>() {
 
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(User result) {
                 Log.d("chandler", "testHttpGet return:" + result);
             }
 
@@ -136,7 +161,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void testHttpPostForDownloadProgressCancelTest() {
-        Log.d(TAG, "testHttpPostForDownloadProgress: ");
+        Log.d(TAG, "testHttpPostForDownloadProgressCancelTest: ");
         String url = "http://a.hiphotos.baidu.com/image/h%3D300/sign=a18b980dbd3533faeab6952e98d3fdca/9f510fb30f2442a76160eca6dd43ad4bd1130242.jpg";
         String path = Environment.getExternalStorageDirectory() + File.separator + "demo.txt";
 

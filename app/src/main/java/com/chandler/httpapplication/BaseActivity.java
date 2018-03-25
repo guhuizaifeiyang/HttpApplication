@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.chandler.http.AppException;
 import com.chandler.http.OnGlobalExceptionListener;
+import com.chandler.http.RequestManager;
 
 /**
  * Created by yaomenglin on 2018/3/24.
@@ -18,5 +19,11 @@ public class BaseActivity extends AppCompatActivity implements OnGlobalException
             }
         }
         return false;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RequestManager.getInstance().cancelRequest(toString());
     }
 }

@@ -20,6 +20,12 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
 
     @Override
     protected Object doInBackground(Void... voids) {
+        if (request.callback != null) {
+            Object o = request.callback.preRequest();
+            if (null != o) {
+                return o;
+            }
+        }
         return request(0);
     }
 
@@ -75,7 +81,7 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
             }
             Log.d("chandler", "onPostExecute: exception = "+(AppException) o);
         } else {
-            request.callback.onSuccess((String) o);
+            request.callback.onSuccess(o);
             Log.d("chandler", "onPostExecute: result = " + o);
         }
     }

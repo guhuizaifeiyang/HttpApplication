@@ -43,7 +43,8 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
                     out.close();
                     result = new String(out.toByteArray());
                     Log.d("chandler", "parse: result =" + result);
-                    return bindData(result);
+                    T t = bindData(result);
+                    return postRequest(t);
                 } else {
                     FileOutputStream out = new FileOutputStream(path);
                     InputStream is = connection.getInputStream();
@@ -61,7 +62,8 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
                     is.close();
                     out.flush();
                     out.close();
-                    return bindData(path);
+                    T t = bindData(path);
+                    return postRequest(t);
                 }
             } else {
                 throw new AppException(status, connection.getResponseMessage());
@@ -84,6 +86,16 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
     @Override
     public void cancel() {
         isCancelled = true;
+    }
+
+    @Override
+    public T preRequest() {
+        return null;
+    }
+
+    @Override
+    public T postRequest(T t) {
+        return t;
     }
 
     @Override

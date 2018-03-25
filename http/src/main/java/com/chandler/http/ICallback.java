@@ -7,7 +7,7 @@ import java.net.HttpURLConnection;
  */
 
 public interface ICallback<T> {
-    void onSuccess(String result);
+    void onSuccess(T result);
 
     void onFailure(AppException o);
 
@@ -16,5 +16,8 @@ public interface ICallback<T> {
 
     void onProgressUpdated(int curLen, int totalLen);
     void cancel();
+
+    T preRequest();
+    T postRequest(T t);
 
 }
