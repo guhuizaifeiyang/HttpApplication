@@ -1,21 +1,38 @@
 package com.chandler.http;
 
+import android.os.Build;
+
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by weijie on 18-3-23.
  */
 
 public class Request {
+    private RequestTask task;
+
     public void checkIfCancelled() throws AppException{
         if (isCancelled) {
             throw new AppException(AppException.ErrorType.CANCEL, "the request has been cancelled");
         }
     }
 
-    public void cancel() {
+    public void cancel(boolean force) {
         isCancelled = true;
         callback.cancel();
+        if (force && task != null) {
+            task.cancel(force);
+        }
+    }
+
+    public void execute(ExecutorService mRequestExecutor) {
+        task = new RequestTask(this);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+            task.executeOnExecutor(mRequestExecutor);
+        } else {
+            task.execute();
+        }
     }
 
     public enum RequestMethod {GET, POST, PUT, DELETE}
