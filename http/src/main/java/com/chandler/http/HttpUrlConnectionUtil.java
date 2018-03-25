@@ -3,6 +3,7 @@ package com.chandler.http;
 import android.webkit.URLUtil;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -42,6 +43,9 @@ public class HttpUrlConnectionUtil {
 
             addHeader(connection, request.headers);
             return connection;
+        } catch (InterruptedIOException e) {
+            e.printStackTrace();
+            throw new AppException(AppException.ErrorType.TIMEOUT, e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
             throw new AppException(e.getMessage());
@@ -65,6 +69,9 @@ public class HttpUrlConnectionUtil {
             OutputStream os = connection.getOutputStream();
             os.write(request.content.getBytes());
             return connection;
+        } catch (InterruptedIOException e) {
+            e.printStackTrace();
+            throw new AppException(AppException.ErrorType.TIMEOUT, e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
             throw new AppException(e.getMessage());

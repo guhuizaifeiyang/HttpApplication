@@ -12,7 +12,7 @@ import java.net.HttpURLConnection;
  */
 
 public class RequestTask extends AsyncTask<Void, Integer, Object>{
-    private Request request;
+    public Request request;
 
     public RequestTask(Request request) {
         this.request = request;
@@ -20,6 +20,10 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
 
     @Override
     protected Object doInBackground(Void... voids) {
+        return request(0);
+    }
+
+    public Object request(int retry) {
         try {
             HttpURLConnection connection =  HttpUrlConnectionUtil.execute(request);
             if (request.isEnableProgress()) {
@@ -36,6 +40,12 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
 
         } catch (AppException e) {
             e.printStackTrace();
+            if (e.type == AppException.ErrorType.TIMEOUT) {
+                if (retry < request.maxRetryCount) {
+                    retry++;
+                    return request(retry);
+                }
+            }
             return e;
         }
     }

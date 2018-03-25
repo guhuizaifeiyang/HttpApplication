@@ -26,6 +26,8 @@ public class Request {
 
     public RequestMethod method;
 
+    public final int maxRetryCount = 3;
+
     public void setOnGlobalExceptionListener(OnGlobalExceptionListener onGlobalExceptionListener) {
         this.onGlobalExceptionListener = onGlobalExceptionListener;
     }
