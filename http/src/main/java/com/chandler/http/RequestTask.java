@@ -25,6 +25,7 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
 
     public Object request(int retry) {
         try {
+            isCancelled();
             HttpURLConnection connection =  HttpUrlConnectionUtil.execute(request);
             if (request.isEnableProgress()) {
                 return request.callback.parse(connection, new OnProgressUpdateListener() {
@@ -48,6 +49,11 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
             }
             return e;
         }
+    }
+
+    @Override
+    protected void onCancelled() {
+        super.onCancelled();
     }
 
     @Override

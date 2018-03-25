@@ -7,6 +7,17 @@ import java.util.Map;
  */
 
 public class Request {
+    public void checkIfCancelled() throws AppException{
+        if (isCancelled) {
+            throw new AppException(AppException.ErrorType.CANCEL, "the request has been cancelled");
+        }
+    }
+
+    public void cancel() {
+        isCancelled = true;
+        callback.cancel();
+    }
+
     public enum RequestMethod {GET, POST, PUT, DELETE}
 
     public ICallback callback;
@@ -27,6 +38,7 @@ public class Request {
     public RequestMethod method;
 
     public final int maxRetryCount = 3;
+    public volatile boolean isCancelled = false;
 
     public void setOnGlobalExceptionListener(OnGlobalExceptionListener onGlobalExceptionListener) {
         this.onGlobalExceptionListener = onGlobalExceptionListener;

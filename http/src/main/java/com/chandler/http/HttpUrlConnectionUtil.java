@@ -36,12 +36,14 @@ public class HttpUrlConnectionUtil {
     private static HttpURLConnection get(Request request) throws AppException {
         HttpURLConnection connection = null;
         try {
+            request.checkIfCancelled();
             connection = (HttpURLConnection) new URL(request.url).openConnection();
             connection.setRequestMethod(request.method.name());
             connection.setConnectTimeout(15 * 3000);
             connection.setReadTimeout(15 * 3000);
 
             addHeader(connection, request.headers);
+            request.checkIfCancelled();
             return connection;
         } catch (InterruptedIOException e) {
             e.printStackTrace();
@@ -57,6 +59,7 @@ public class HttpUrlConnectionUtil {
 
     private static HttpURLConnection post(Request request) throws AppException {
         try {
+            request.checkIfCancelled();
             HttpURLConnection connection = (HttpURLConnection) new URL(request.url).openConnection();
             connection.setRequestMethod(request.method.name());
             connection.setConnectTimeout(15 * 3000);
@@ -66,8 +69,10 @@ public class HttpUrlConnectionUtil {
 
             addHeader(connection, request.headers);
 
+            request.checkIfCancelled();
             OutputStream os = connection.getOutputStream();
             os.write(request.content.getBytes());
+            request.checkIfCancelled();
             return connection;
         } catch (InterruptedIOException e) {
             e.printStackTrace();

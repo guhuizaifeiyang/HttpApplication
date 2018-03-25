@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 
 public abstract class AbstractCallback<T> implements ICallback<T> {
     private String path;
+    private volatile boolean isCancelled;
 
     @Override
     public T parse(HttpURLConnection connection) throws AppException {
@@ -24,6 +25,7 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
     @Override
     public T parse(HttpURLConnection connection, OnProgressUpdateListener progressUpdateListener) throws AppException {
         try {
+            checkIfCancelled();
             int status = connection.getResponseCode();
             if (status == HttpURLConnection.HTTP_OK) {
                 String result;
@@ -33,6 +35,7 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
                     byte[] buffer = new byte[2048];
                     int len;
                     while ((len = is.read(buffer)) != -1) {
+                        checkIfCancelled();
                         out.write(buffer, 0, len);
                     }
                     is.close();
@@ -48,6 +51,7 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
                     int totalLen = connection.getContentLength();
                     int len, curLen = 0;
                     while ((len = is.read(buffer)) != -1) {
+                        checkIfCancelled();
                         out.write(buffer, 0, len);
                         curLen += len;
                         if (progressUpdateListener != null) {
@@ -69,6 +73,17 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
             e.printStackTrace();
             throw new AppException(e.getMessage());
         }
+    }
+
+    private void checkIfCancelled() throws AppException{
+        if (isCancelled) {
+            throw new AppException(AppException.ErrorType.CANCEL, "the request has been cancelled");
+        }
+    }
+
+    @Override
+    public void cancel() {
+        isCancelled = true;
     }
 
     @Override

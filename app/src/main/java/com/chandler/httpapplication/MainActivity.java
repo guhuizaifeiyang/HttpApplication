@@ -125,6 +125,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         request.setOnGlobalExceptionListener(this);
         RequestTask task = new RequestTask(request);
         task.execute();
+        task.cancel(true);
+        request.cancel();
     }
 
     private void testHttpPostForDownload() {
