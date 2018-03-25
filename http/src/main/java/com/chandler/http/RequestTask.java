@@ -70,6 +70,8 @@ public class RequestTask extends AsyncTask<Void, Integer, Object>{
                 if (!request.onGlobalExceptionListener.handleException((AppException) o)) {
                     request.callback.onFailure((AppException) o);
                 }
+            } else {
+                request.callback.onFailure((AppException) o);
             }
             Log.d("chandler", "onPostExecute: exception = "+(AppException) o);
         } else {

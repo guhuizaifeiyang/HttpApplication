@@ -50,7 +50,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.btn:
 //                testHttpPostOnSubThread();
 //                testHttpPostOnSubThreadForGeneric();
-                testHttpPostForDownloadProgress();
+//                testHttpPostForDownloadProgress();
+                testHttpPostForDownloadProgressCancelTest();
         }
 
     }
@@ -125,8 +126,40 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         request.setOnGlobalExceptionListener(this);
         RequestTask task = new RequestTask(request);
         task.execute();
-        task.cancel(true);
-        request.cancel();
+    }
+
+    private void testHttpPostForDownloadProgressCancelTest() {
+        Log.d(TAG, "testHttpPostForDownloadProgress: ");
+        String url = "http://a.hiphotos.baidu.com/image/h%3D300/sign=a18b980dbd3533faeab6952e98d3fdca/9f510fb30f2442a76160eca6dd43ad4bd1130242.jpg";
+        String path = Environment.getExternalStorageDirectory() + File.separator + "demo.txt";
+
+        final Request request = new Request(url, Request.RequestMethod.GET);
+        request.setOnGlobalExceptionListener(this);
+        final RequestTask task = new RequestTask(request);
+        request.setEnableProgress(true);
+        request.setCallback(new FileCallback() {
+
+            @Override
+            public void onSuccess(String result) {
+                Log.d(TAG, "testHttpGet return:" + result);
+            }
+
+            @Override
+            public void onFailure(AppException e) {
+                Log.d(TAG, "onFailure: status code = " + e.statusCode + ", message = " + e.responseMessage);
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onProgressUpdated(int curLen, int totalLen) {
+                Log.d(TAG, "onProgressUpdated: curLen = " + curLen + ", totalLen = " + totalLen);
+                if (curLen * 100L / totalLen > 50) {
+//                    task.cancel(true);
+                    request.cancel();
+                }
+            }
+        }.setCachePath(path));
+        task.execute();
     }
 
     private void testHttpPostForDownload() {
