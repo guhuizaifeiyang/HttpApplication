@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.chandler.http.AppException;
 import com.chandler.http.FileCallback;
 import com.chandler.http.JasonCallback;
+import com.chandler.http.JsonArrayReaderCallback;
 import com.chandler.http.Request;
 import com.chandler.http.RequestManager;
 import com.chandler.http.RequestTask;
@@ -54,8 +55,44 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //                testHttpPostOnSubThreadForGeneric();
 //                testHttpPostForDownloadProgress();
 //                testHttpPostForDownloadProgressCancelTest();
-                testHttpPostOnSubThreadForGenericLoadMore();
+//                testHttpPostOnSubThreadForGenericLoadMore();
+                testHttpForJsonReaderArray();
         }
+
+    }
+
+    public void testHttpForJsonReaderArray() {
+        String url = "http://api.stay4it.com/v1/public/core/?service=user.getAll";
+        url += "&timestamp=" + System.currentTimeMillis() + "&count=30";
+        Request request = new Request(url, Request.RequestMethod.GET);
+        String path = Environment.getExternalStorageDirectory() + File.separator + "jsonarray.tmp";
+        request.setCallback(new JsonArrayReaderCallback<Module>() {
+
+            @Override
+            public ArrayList<Module> preRequest() {
+//                TODO fetch data
+                return null;
+            }
+
+            @Override
+            public ArrayList<Module> postRequest(ArrayList<Module> modules) {
+//                TODO insert into db
+                return modules;
+            }
+
+            @Override
+            public void onSuccess(ArrayList<Module> result) {
+                Log.d("chandler", "result " + result.size());
+
+
+            }
+
+            @Override
+            public void onFailure(AppException e) {
+                e.printStackTrace();
+            }
+        }.setCachePath(path));
+        RequestManager.getInstance().performRequest(request);
 
     }
 
