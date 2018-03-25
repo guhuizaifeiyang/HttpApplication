@@ -16,6 +16,7 @@ import com.chandler.http.AppException;
 import com.chandler.http.FileCallback;
 import com.chandler.http.JasonCallback;
 import com.chandler.http.Request;
+import com.chandler.http.RequestManager;
 import com.chandler.http.RequestTask;
 
 import java.io.File;
@@ -38,6 +39,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         checkPermissions();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RequestManager.getInstance().cancelRequest(toString());
     }
 
     @Override
@@ -135,7 +142,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         final Request request = new Request(url, Request.RequestMethod.GET);
         request.setOnGlobalExceptionListener(this);
-        final RequestTask task = new RequestTask(request);
         request.setEnableProgress(true);
         request.setCallback(new FileCallback() {
 
@@ -154,12 +160,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void onProgressUpdated(int curLen, int totalLen) {
                 Log.d(TAG, "onProgressUpdated: curLen = " + curLen + ", totalLen = " + totalLen);
                 if (curLen * 100L / totalLen > 50) {
-//                    task.cancel(true);
-                    request.cancel();
+//                    request.cancel();
                 }
             }
         }.setCachePath(path));
-        task.execute();
+        request.setTag(toString());
+        RequestManager.getInstance().performRequest(request);
     }
 
     private void testHttpPostForDownload() {

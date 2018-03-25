@@ -40,6 +40,12 @@ public class Request {
     public final int maxRetryCount = 3;
     public volatile boolean isCancelled = false;
 
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String tag;
+
     public void setOnGlobalExceptionListener(OnGlobalExceptionListener onGlobalExceptionListener) {
         this.onGlobalExceptionListener = onGlobalExceptionListener;
     }
